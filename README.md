@@ -1,3 +1,113 @@
+<p align="center">
+  <b><a href="#-english">🇬🇧 English</a></b> &nbsp;•&nbsp; <b><a href="#-deutsch">🇩🇪 Deutsch</a></b>
+</p>
+
+---
+
+<a name="-english"></a>
+# AZ-Touch MOD ESP32 MicroPython Driver & Test App
+
+A complete, optimized, and ready-to-use MicroPython driver and test application for the **AZ-Delivery AZ-Touch MOD** (or ArduiTouch) enclosure kit with ESP32, 2.4" / 2.8" SPI TFT Display (**ILI9341**), resistive touchscreen (**XPT2046**), PWM backlight, and piezo buzzer.
+
+---
+
+## ✨ Features
+
+- **ILI9341 TFT Display (320x240 Landscape):** Fast SPI driver (20 MHz) with clean graphics primitives (rectangles, lines, text, buttons).
+- **XPT2046 Touch Controller with Dynamic Bus Clock Switching:**
+  - Solves the common shared-SPI-bus issue: ESP32 automatically down-clocks SPI to **1 MHz** during touch reading and restores **20 MHz** for display rendering.
+  - Hardware interrupt (`T_IRQ` on GPIO 27) with debounce and multi-sampling.
+  - Fully calibrated for landscape orientation ($320 \times 240$, correct X/Y and top/bottom mapping).
+- **PWM Backlight Dimming (GPIO 15):** Stepless brightness control (100%, 75%, 50%, 25%, 10%, Off) with proper inverted logic for the T1 transistor.
+- **Acoustic Feedback (Buzzer on GPIO 21):** PWM-driven piezo tone on touch events and button presses (via T2 transistor).
+- **OTA / WebREPL Ready:** Fully wireless flashing, configuration, and execution over Wi-Fi via WebREPL.
+
+---
+
+## 📌 Pinout (AZ-Touch MOD ESP32)
+
+| Component | Signal | ESP32 GPIO | Description |
+| :--- | :--- | :--- | :--- |
+| **Display (ILI9341)** | `TFT_CS` | **GPIO 5** | Display Chip Select |
+| | `TFT_DC` | **GPIO 4** | Data / Command |
+| | `TFT_RST` | **GPIO 22** | Hardware Reset |
+| | `LED` | **GPIO 15** | Backlight (PWM via Transistor T1, Inverted) |
+| **Touch (XPT2046)** | `T_CS` | **GPIO 14** | Touch Controller Chip Select |
+| | `T_IRQ` | **GPIO 27** | Touch Interrupt (Active LOW on touch) |
+| **Shared SPI Bus** | `SCK` | **GPIO 18** | SPI Clock (VSPI SCK) |
+| | `MOSI` | **GPIO 23** | SPI Data to Display/Touch (VSPI MOSI) |
+| | `MISO` | **GPIO 19** | SPI Data from Touch (VSPI MISO) |
+| **Beeper / Audio** | `BEEPER` | **GPIO 21** | Piezo Buzzer (PWM via Transistor T2) |
+
+---
+
+## 📂 Project Structure
+
+```text
+az-touch-esp32/
+├── boot.py               # Wi-Fi & WebREPL initialization
+├── main.py               # Autostart wrapper for the test app
+├── tft_test.py           # Main application with UI, touch logic & buzzer
+├── drivers/
+│   ├── ili9341.py        # MicroPython ILI9341 display driver
+│   └── xpt2046.py        # MicroPython XPT2046 touch driver
+├── tools/
+│   ├── webrepl_cli.py    # CLI tool for wireless file transfer
+│   └── esp_exec.py       # Script for remote code execution via WebREPL
+└── README.md
+```
+
+---
+
+## 🚀 Installation & Quick Start
+
+### 1. Transfer Files to ESP32
+
+#### Via WebREPL (Wi-Fi):
+```bash
+# Upload display and touch drivers
+python3 tools/webrepl_cli.py -p <PASSWORD> drivers/ili9341.py <ESP_IP>:ili9341.py
+python3 tools/webrepl_cli.py -p <PASSWORD> drivers/xpt2046.py <ESP_IP>:xpt2046.py
+
+# Upload main test app & autostart script
+python3 tools/webrepl_cli.py -p <PASSWORD> tft_test.py <ESP_IP>:tft_test.py
+python3 tools/webrepl_cli.py -p <PASSWORD> main.py <ESP_IP>:main.py
+```
+
+#### Via USB / mpremote:
+```bash
+mpremote connect /dev/ttyUSB0 fs cp drivers/ili9341.py :ili9341.py
+mpremote connect /dev/ttyUSB0 fs cp drivers/xpt2046.py :xpt2046.py
+mpremote connect /dev/ttyUSB0 fs cp tft_test.py :tft_test.py
+mpremote connect /dev/ttyUSB0 fs cp main.py :main.py
+```
+
+### 2. Run
+After a soft reset (`machine.soft_reset()`), the ESP32 connects to Wi-Fi and automatically launches the graphical test suite.
+
+---
+
+## 📱 Interface & Controls
+
+- **Status Bar:** Shows Wi-Fi IP address, free heap RAM, and live touch coordinates $(X, Y)$.
+- **Canvas:** Allows drawing freehand strokes with finger or stylus.
+- **Buttons:**
+  - **`[ BEEP ]`** – Plays a 3.8 kHz confirmation tone on the buzzer.
+  - **`[ 50% ]`** – Cycles through backlight levels ($100\% \rightarrow 75\% \rightarrow 50\% \rightarrow 25\% \rightarrow 10\% \rightarrow 0\%$).
+  - **`[ COLOR ]`** – Cycles header color theme.
+  - **`[ CLEAR ]`** – Clears the touch canvas.
+
+---
+
+## 📄 License
+MIT License. Free for private and commercial use.
+
+---
+---
+
+<a name="-deutsch"></a>
+# 🇩🇪 Deutsche Beschreibung
+
 # AZ-Touch MOD ESP32 MicroPython Driver & Test App
 
 Ein vollständiger, optimierter und einsatzbereiter MicroPython-Treiber und Testprogramm für das **AZ-Delivery AZ-Touch MOD** (oder ArduiTouch) Gehäuse-Kit mit ESP32, 2.4" / 2.8" SPI TFT Display (**ILI9341**), resistivem Touchscreen (**XPT2046**), PWM-Hintergrundbeleuchtung und Piezo-Buzzer.
